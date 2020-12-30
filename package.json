@@ -17,19 +17,8 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.helloWorld",
-				"title": "Hello World"
-			},
-			{
 				"command": "extension.why3info",
 				"title": "Why3 Info"
-			}
-		],
-		"iconThemes": [
-			{
-				"id": "why3",
-				"label": "Why3",
-				"path": "./fileicons/why3-icon-theme.json"
 			}
 		]
 	},
