@@ -9,7 +9,7 @@ const child_process_1 = require("child_process");
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
-    let cmd_info = vscode.commands.registerCommand('extension.why3info', () => {
+    let cmd_info = vscode.commands.registerCommand('extension.version', () => {
         const why3 = child_process_1.spawn('why3', ['--version']);
         why3.stdout.on('data', (data) => {
             vscode.window.showInformationMessage(`Why3 version : ${data}`);
@@ -18,7 +18,32 @@ function activate(context) {
             vscode.window.showErrorMessage(`Cannot retrieve Why3 version : ${err}`);
         });
     });
+    let cmd_prove = vscode.commands.registerCommand('extension.prove', () => {
+        var _a;
+        const file = (_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document.uri.fsPath;
+        if (file) {
+            const why3 = child_process_1.spawn('why3', ['prove', '-P', 'alt-ergo', file]);
+            why3.stderr.on('data', (data) => {
+                vscode.window.showErrorMessage(`Error : ${data}`);
+            });
+            why3.stdout.on('data', (data) => {
+                vscode.window.showInformationMessage(`Result : ${data}`);
+            });
+            why3.on('error', (err) => {
+                vscode.window.showErrorMessage(`Failure : ${err}`);
+            });
+            why3.on('exit', (code) => {
+                if (code !== null && code === 0) {
+                    vscode.window.showInformationMessage('Sucess');
+                }
+                else {
+                    vscode.window.showErrorMessage('Failed');
+                }
+            });
+        }
+    });
     context.subscriptions.push(cmd_info);
+    context.subscriptions.push(cmd_prove);
 }
 exports.activate = activate;
 function deactivate() { }

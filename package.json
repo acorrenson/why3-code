@@ -10,15 +10,19 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld",
-		"onCommand:extension.why3info"
+		"onCommand:extension.version",
+		"onCommand:extension.prove"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.why3info",
-				"title": "Why3 Info"
+				"command": "extension.version",
+				"title": "get version"
+			},
+			{
+				"command": "extension.prove",
+				"title": "Prove current file (alt-ergo)"
 			}
 		]
 	},
