@@ -15,18 +15,18 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.version",
-		"onCommand:extension.prove"
+		"onCommand:extension.prove",
+		"onLanguage:whyml"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.version",
-				"title": "get version"
+				"command": "why3.version",
+				"title": "Print why3 version"
 			},
 			{
-				"command": "extension.prove",
+				"command": "why3.prove",
 				"title": "Prove current file (alt-ergo)"
 			}
 		]

@@ -3,12 +3,13 @@
 import * as vscode from 'vscode';
 // import { systemDefaultPlatform } from 'vscode-test/out/util';
 import { spawn } from 'child_process';
+import * as commands from './commands';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	let cmd_info = vscode.commands.registerCommand('extension.version', () => {
+	let cmd_info = vscode.commands.registerCommand('why3.version', () => {
 		const why3 = spawn('why3', ['--version']);
 
 		why3.stdout.on('data', (data) => {
@@ -20,30 +21,19 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	});
 
-	let cmd_prove = vscode.commands.registerCommand('extension.prove', () => {
+	let cmd_prove = vscode.commands.registerCommand('why3.prove', () => {
 		const file = vscode.window.activeTextEditor?.document.uri.fsPath;
+
+		let succ = (c: commands.Context) => {
+			vscode.window.showInformationMessage(`Sucess ${c}`);
+		};
+
+		let err = (e: string) => {
+			vscode.window.showErrorMessage(e);
+		};
+
 		if (file) {
-			const why3 = spawn('why3', ['prove', '-P', 'alt-ergo', file]);
-
-			why3.stderr.on('data', (data) => {
-				vscode.window.showErrorMessage(`Error : ${data}`);
-			});
-
-			why3.stdout.on('data', (data) => {
-				vscode.window.showInformationMessage(`Result : ${data}`);
-			});
-
-			why3.on('error', (err) => {
-				vscode.window.showErrorMessage(`Failure : ${err}`);
-			});
-
-			why3.on('exit', (code) => {
-				if (code !== null && code === 0) {
-					vscode.window.showInformationMessage('Sucess');
-				} else {
-					vscode.window.showErrorMessage('Failed');
-				}
-			});
+			commands.prove(file, 'alt-ergo', succ, err);
 		}
 	});
 
