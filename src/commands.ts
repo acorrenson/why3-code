@@ -1,4 +1,5 @@
 import { spawn, spawnSync } from 'child_process';
+import * as vscode from 'vscode';
 
 export type Prover = "alt-ergo" | "cvc4";
 
@@ -17,7 +18,7 @@ interface Result {
 
 export type Context = Map<string, Map<string, Status>>;
 
-let analyse_result = (s: string): Result => {
+export function analyse_result(s: string): Result {
   let tokens = s.split(' ');
   let fname = tokens[0];
   let module = tokens[1];
@@ -32,18 +33,22 @@ let analyse_result = (s: string): Result => {
     default:
       return { fname, module, declaration, status: Status.Unknown };
   }
-};
+}
 
 type sucess_call = (ctx: Context) => void;
 type failure_call = (err: string) => void;
 
 export function prove(fpath: string, prover: Prover, succ: sucess_call, err: failure_call) {
-  let why3 = spawn('why3', ['prove', '-P', prover]);
+  let why3 = spawn('why3', ['prove', '-P', prover, fpath]);
 
   let ctx = new Map<string, Map<string, Status>>();
 
-  why3.stdout.on('data', (data) => {
-    let { module, declaration, status } = analyse_result(data);
+  why3.stderr.on('data', (err) => {
+    vscode.window.showWarningMessage(`Error : ${err}`);
+  });
+
+  why3.stdout.on('data', (data: string) => {
+    let { module, declaration, status } = analyse_result(data.toString());
     if (ctx.has(module)) {
       ctx.get(module)?.set(declaration, status);
     } else {
@@ -54,7 +59,7 @@ export function prove(fpath: string, prover: Prover, succ: sucess_call, err: fai
   });
 
   why3.on('exit', (code) => {
-    if (code !== null) {
+    if (code !== null && code === 0) {
       succ(ctx);
     } else {
       err(`why3 call exited with anormal exit code ${code}`);

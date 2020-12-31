@@ -23,7 +23,27 @@ function activate(context) {
         var _a;
         const file = (_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document.uri.fsPath;
         let succ = (c) => {
-            vscode.window.showInformationMessage(`Sucess ${c}`);
+            let pannel = vscode.window.createWebviewPanel('why3results', 'why3', vscode.ViewColumn.Two);
+            let render_declaration = (declaration, status) => {
+                return `<li><bold>${declaration}</bold>${status}</li>`;
+            };
+            let render_module = (module, declarations) => {
+                return `
+					<h2>${module}<h2>
+					<ul>${Array.from(declarations).map(([decl, status]) => render_declaration(decl, status))} </ul>`;
+            };
+            pannel.webview.html = `<!DOCTYPE html >
+				<html lang="en" >
+				<head>
+					<meta charset="UTF-8" >
+					<meta name="viewport" content = "width=device-width, initial-scale=1.0" >
+					<title>why3</title>
+				</head>
+				<body>
+					<h1>Results</h1>
+					${Array.from(c).map(([module, declarations]) => render_module(module, declarations))}
+				</body>
+				</html>`;
         };
         let err = (e) => {
             vscode.window.showErrorMessage(e);

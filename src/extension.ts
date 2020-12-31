@@ -25,7 +25,36 @@ export function activate(context: vscode.ExtensionContext) {
 		const file = vscode.window.activeTextEditor?.document.uri.fsPath;
 
 		let succ = (c: commands.Context) => {
-			vscode.window.showInformationMessage(`Sucess ${c}`);
+			let pannel = vscode.window.createWebviewPanel(
+				'why3results',
+				'why3',
+				vscode.ViewColumn.Two
+			);
+
+			let render_declaration = (declaration: string, status: commands.Status) => {
+				return `<li><bold>${declaration}</bold>${status}</li>`;
+			};
+
+			let render_module = (module: string, declarations: Map<string, commands.Status>) => {
+				return `
+					<h2>${module}<h2>
+					<ul>${Array.from(declarations).map(([decl, status]) => render_declaration(decl, status))
+					} </ul>`;
+			};
+
+			pannel.webview.html = `<!DOCTYPE html >
+				<html lang="en" >
+				<head>
+					<meta charset="UTF-8" >
+					<meta name="viewport" content = "width=device-width, initial-scale=1.0" >
+					<title>why3</title>
+				</head>
+				<body>
+					<h1>Results</h1>
+					${Array.from(c).map(([module, declarations]) => render_module(module, declarations))
+				}
+				</body>
+				</html>`;
 		};
 
 		let err = (e: string) => {
